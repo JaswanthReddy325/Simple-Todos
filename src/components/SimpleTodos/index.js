@@ -1,95 +1,109 @@
 import {Component} from 'react'
+import {v4 as uuidV4} from 'uuid'
+
 import TodoItem from '../TodoItem'
+
 import './index.css'
+
+const initialTodosList = [
+  {
+    id: 1,
+    title: 'Book the ticket for today evening',
+  },
+  {
+    id: 2,
+    title: 'Rent the movie for tomorrow movie night',
+  },
+  {
+    id: 3,
+    title: 'Confirm the slot for the yoga session tomorrow morning',
+  },
+  {
+    id: 4,
+    title: 'Drop the parcel at Bloomingdale',
+  },
+  {
+    id: 5,
+    title: 'Order fruits on Big Basket',
+  },
+  {
+    id: 6,
+    title: 'Fix the production issue',
+  },
+  {
+    id: 7,
+    title: 'Confirm my slot for Saturday Night',
+  },
+  {
+    id: 8,
+    title: 'Get essentials for Sunday car wash',
+  },
+]
 
 class SimpleTodos extends Component {
   state = {
-    todosList: [
-      {id: 1, title: 'Book the ticket for today evening', completed: false},
-      {
-        id: 2,
-        title: 'Rent the movie for tomorrow movie night',
-        completed: false,
-      },
-      {
-        id: 3,
-        title: 'Confirm the slot for the yoga session tomorrow morning',
-        completed: false,
-      },
-      {id: 4, title: 'Drop the parcel at Bloomingdale', completed: false},
-      {id: 5, title: 'Order fruits on Big Basket', completed: false},
-      {id: 6, title: 'Fix the production issue', completed: false},
-      {id: 7, title: 'Confirm my slot for Saturday Night', completed: false},
-      {id: 8, title: 'Get essentials for Sunday car wash', completed: false},
-    ],
-    newTodoTitle: '',
-    newTodoCount: 1,
+    todosList: initialTodosList,
+    titleInput: '',
   }
 
-  handleAddTodo = () => {
-    const {newTodoTitle, newTodoCount} = this.state
-    const newTodos = Array.from({length: newTodoCount}, (_, i) => ({
-      id: Date.now() + i,
-      title: newTodoTitle,
-      completed: false,
-    }))
-    this.setState(prevState => ({
-      todosList: [...prevState.todosList, ...newTodos],
-      newTodoTitle: '',
-      newTodoCount: 1,
-    }))
-  }
+  renderTodoInputField = () => {
+    const {titleInput} = this.state
 
-  handleChange = e => {
-    this.setState({[e.target.name]: e.target.value})
+    const onChangeHandler = event => {
+      this.setState({titleInput: event.target.value})
+    }
+
+    const onAddTodo = () => {
+      if (titleInput === '') return
+
+      this.setState(prevState => ({
+        todosList: [...prevState.todosList, {id: uuidV4(), title: titleInput}],
+        titleInput: '',
+      }))
+    }
+
+    return (
+      <div className="title-input-container">
+        <input value={titleInput} onChange={onChangeHandler} />
+        <button className="add-btn" type="button" onClick={onAddTodo}>
+          Add
+        </button>
+      </div>
+    )
   }
 
   deleteTodo = id => {
     const {todosList} = this.state
-    const updatedTodoList = todosList.filter(todo => todo.id !== id)
-    this.setState({todosList: updatedTodoList})
+    const updatedTodosList = todosList.filter(eachTodo => eachTodo.id !== id)
+
+    this.setState({
+      todosList: updatedTodosList,
+    })
   }
 
-  toggleComplete = id => {
-    const {todosList} = this.state
-    const updatedTodoList = todosList.map(todo =>
-      todo.id === id ? {...todo, completed: !todo.completed} : todo,
-    )
-    this.setState({todosList: updatedTodoList})
+  saveTodo = task => {
+    this.setState(prevState => ({
+      todosList: prevState.todosList.map(item =>
+        item.id === task.id ? task : item,
+      ),
+    }))
   }
 
   render() {
-    const {todosList, newTodoTitle, newTodoCount} = this.state
+    const {todosList} = this.state
+
     return (
-      <div className="container">
-        <div className="inner-container">
+      <div className="app-container">
+        <div className="simple-todos-container">
           <h1 className="heading">Simple Todos</h1>
-          <div className="add-todo">
-            <input
-              type="text"
-              name="newTodoTitle"
-              value={newTodoTitle}
-              onChange={this.handleChange}
-              placeholder="Enter todo title"
-            />
-            <input
-              type="number"
-              name="newTodoCount"
-              value={newTodoCount}
-              onChange={this.handleChange}
-              placeholder="Enter number of todos"
-            />
-            <button onClick={this.handleAddTodo} type="button">
-              Add
-            </button>
-          </div>
+          {this.renderTodoInputField()}
           <ul className="todos-list">
-            {todosList.map(todo => (
+            {todosList.map(eachTodo => (
               <TodoItem
-                key={todo.id}
-                todoDetails={todo}
+                key={eachTodo.id}
+                todoDetails={eachTodo}
                 deleteTodo={this.deleteTodo}
-                toggleComplete={this.toggleComplete}
+                saveTodo={this.saveTodo}
               />
             ))}
           </ul>
