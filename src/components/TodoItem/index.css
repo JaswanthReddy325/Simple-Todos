@@ -1,0 +1,12 @@
+/* Write your CSS here */
+.list-container {
+  display: flex;
+  justify-content: space-between;
+}
+.button-container{
+  color: #ff0b37;
+  border-color: #ff0b37;
+  height: 40px;
+  width: 90px;
+  border-radius: 10px;
+}
